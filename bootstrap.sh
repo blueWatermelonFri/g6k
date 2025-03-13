@@ -62,7 +62,7 @@ $PIP install -U pip -r requirements.txt
 
 # Install FPLLL
 
-git clone https://github.com/fplll/fplll g6k-fplll
+git clone https://github.com/blueWatermelonFri/fplll.git g6k-fplll
 cd g6k-fplll || exit
 git pull # Update if it was checked-out before
 ./autogen.sh
@@ -90,7 +90,7 @@ cd ..
 
 # Install FPyLLL
 
-git clone https://github.com/fplll/fpylll g6k-fpylll
+git clone https://github.com/blueWatermelonFri/fpylll.git g6k-fpylll
 cd g6k-fpylll || exit
 git pull # Update if it was checked-out before
 $PIP install -r requirements.txt -r suggestions.txt

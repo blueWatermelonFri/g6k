@@ -121,8 +121,9 @@ def pump(g6k, tracer, kappa, blocksize, dim4free, down_sieve=False,             
     pump.r = kappa+blocksize
     pump.l = kappa+dim4free  # noqa
 
-    g6k.shrink_db(0)
+    g6k.shrink_db(0) # kappa=0，pump.r是个定值100
     g6k.lll(kappa, pump.r)
+    #print(kappa," ",max(pump.r-start_up_n, pump.l+1)," ", pump.r)
     g6k.initialize_local(kappa, max(pump.r-start_up_n, pump.l+1), pump.r)
 
     pump.sat_factor = 1.

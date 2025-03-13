@@ -64,7 +64,7 @@ def asvp_kernel(arg0, params=None, seed=None):
     challenge_seed = params.pop("challenge_seed")
 
     if load_matrix is None:
-        A, _ = load_svpchallenge_and_randomize(n, s=challenge_seed, seed=seed)
+        A, _ = load_svpchallenge_and_randomize(n, s=challenge_seed, seed=seed) # 会在这里面做LLL reducntion
         if verbose:
             print(("Loaded challenge dim %d" % n))
     else:
@@ -75,7 +75,13 @@ def asvp_kernel(arg0, params=None, seed=None):
     g6k = Siever(A, params, seed=seed)
     tracer = SieveTreeTracer(g6k, root_label=("svp-challenge", n), start_clocks=True)
 
-    gh = gaussian_heuristic([g6k.M.get_r(i, i) for i in range(n)])
+    # /home/heyuanhong/project/g6k/g6k-fp111/g6k-fpy111/src/fpy111/uti1l.pyx 定义gaussian heuristic
+    # intermatrix的定义 /home/heyuanhong/project/g6k/g6k-fp111/g6k-fpy111/src/fpy111/fp1l1/integer_matrix.pyx
+    # get r的定义/home/heyuanhong/project/g6k/g6k-fp111/g6k-fpy111/src/fpy111/fp111/gso.pyx
+    # g6k.M是由A转化得到的GS0矩阵，用于构造Gram-Schmidt orthogonalization
+    # 根据高斯启发式预测最短向量的平方范数。
+
+    gh = gaussian_heuristic([g6k.M.get_r(i, i) for i in range(n)]) # /home/heyuanhong/project/g6k/g6k/siever.pyx
     goal_r0 = (1.05 ** 2) * gh
     if verbose:
         print(
