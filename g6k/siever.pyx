@@ -1285,7 +1285,11 @@ cdef class Siever(object):
         if max_db_size==0:
             max_db_size = 500 + 10*self.n + 2 * self.params.db_size_factor * self.params.db_size_base ** self.n
 
+        print("max_db_size = ", max_db_size)
+        print("self.db_size() = ", self.db_size())
+
         if self.db_size() > max_db_size:
+            # print("resize_db") 几乎不会进来
             self.resize_db(max_db_size)
 
         sig_on()

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-jobs="-j 4 "
+jobs="-j 16 "
 if [ "$1" = "-j" ]; then
    jobs="-j $2 "
 fi
