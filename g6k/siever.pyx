@@ -189,11 +189,12 @@ cdef class Siever(object):
 
 
         cdef int i, j, k
-        cdef int m = self.full_n
+        cdef int m = self.full_n # self.full_n = self._core.full_n, Full dimension of the lattice.
         cdef int n = r_bound - l_bound
-        cdef int d = self.M.d
+        cdef int d = self.M.d    # d = m? 因为self._core.full_n = self.M.d
 
         if not self.params.dual_mode:
+            # 走这个分支
             for i in range(r_bound):
                 self.M.update_gso_row(i, i)
         else:
@@ -286,8 +287,9 @@ cdef class Siever(object):
             raise ValueError("Parameters %d, %d, %d do not satisfy constraint  0 <= ll <= l <= r <= self.M.d"%(ll, l, r))
 
         if update_gso:
-            self.update_gso(ll, r)
+            self.update_gso(ll, r) # 对于100维，ll=0, r=100
         sig_on()
+        # 对于100维度，ll=0, l=70, r=100
         self._core.initialize_local(ll, l, r)
         sig_off()
         self.initialized = True
@@ -1285,11 +1287,11 @@ cdef class Siever(object):
         if max_db_size==0:
             max_db_size = 500 + 10*self.n + 2 * self.params.db_size_factor * self.params.db_size_base ** self.n
 
-        print("max_db_size = ", max_db_size)
-        print("self.db_size() = ", self.db_size())
+        # print("max_db_size = ", max_db_size)
+        # print("self.db_size() = ", self.db_size())
 
         if self.db_size() > max_db_size:
-            # print("resize_db") 几乎不会进来
+            # print("resize_db") 几乎不会进来，max_db_size总是比db_size()大
             self.resize_db(max_db_size)
 
         sig_on()

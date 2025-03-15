@@ -33,7 +33,9 @@ void Siever::gauss_sieve(size_t max_db_size)
 {
     CPUCOUNT(301);
     switch_mode_to(SieveStatus::gauss);
+    // printf("error : begin gauss sieve\n");
     parallel_sort_cdb();
+    // printf("error : end gauss sieve\n");
     statistics.inc_stats_sorting_sieve();
     recompute_histo();
     if (max_db_size==0)
@@ -76,8 +78,12 @@ void Siever::gauss_sieve(size_t max_db_size)
     // termination condition outer loop
     while(cdb.size() <= max_db_size)
     {
+
+        // printf("cdb.size() = %d, max_db_size = %d\n", cdb.size() , max_db_size);
         size_t const old_S = status_data.gauss_data.queue_start;
+        // printf("info : begin grow db\n");
         if (iter) grow_db(cdb.size()*1.02 + 10);
+        // printf("info : end grow db\n");
         ++iter;
 
         // sort the old and new part separately. Note that (except at the beginning), these also

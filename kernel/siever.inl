@@ -221,13 +221,17 @@ inline void Siever::recompute_data_for_entry_babai(Entry &e, int babai_index)
     bool constexpr consider_lift = (what_to_recompute & Recompute::consider_otf_lift) != Recompute::none;
     bool constexpr rec_otf_helper = (what_to_recompute & Recompute::recompute_otf_helper) != Recompute::none;
 
+    // condiser_lift 时0时1，其它参数都是1；
+    // printf("rec_yr = %d, %d, %d, %d, %d, %d, babai_index = %d\n", rec_yr, rec_len, rec_c, rec_uid, consider_lift, rec_otf_helper, babai_index);
     CPP17CONSTEXPRIF(rec_len) e.len = 0.;
 
   // recompute y, yr, len for the other indices (if requested)
     for (int i = n-1; i >= babai_index; --i)
     {
+        // printf("first caclue\n");
         CPP17CONSTEXPRIF(rec_yr || rec_len)
         {
+            // muT和sqrt是什么
             FT const yri = std::inner_product(e.x.cbegin()+i, e.x.cbegin()+n, muT[i].cbegin()+i,  static_cast<FT>(0.)) * sqrt_rr[i];
             CPP17CONSTEXPRIF (rec_yr) e.yr[i] = yri;    // Note : conversion to lower precision
             CPP17CONSTEXPRIF (rec_len) e.len+=yri * yri; // slightly inefficient if we only compute the lenght and not yr, but that does not happen anyway.

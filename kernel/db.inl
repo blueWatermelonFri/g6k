@@ -118,23 +118,28 @@ Entry Siever::sample(unsigned int large)
 
     size_t fullS = cdb.size();
 
+
+    // fullS < 200 + 10*n ?是为什么
     if (large || fullS < 200 + 10*n || !params.sample_by_sums)
     {
+        // printf("error : sample litte vector large = %d, fullS = %d, n = %d, params.sample_by_sums = %d\n", large, fullS, n, params.sample_by_sums);
         std::fill(e.x.begin(), e.x.end(), 0);
         size_t np = n / 2;
-        np = (large > 3) ? 0 : np;
+        np = (large > 3) ? 0 : np; // large 通常等0
         for (size_t j = np; j < n; ++j){
-            e.x[j] = (rng() % 5) - 2*(j < n-1); // Making sure the last cordinate is non-zero
+            e.x[j] = (rng() % 5) - 2*(j < n-1); // Making sure the last cordinate is non-zero 半径为（0-2）的球
             for (size_t l = 0; l < large; ++l)
             {
-                e.x[j] += (rng() % 7) - 3*(j < n-1);
+                e.x[j] += (rng() % 7) - 3*(j < n-1); //这是为什么？
+                // printf("in loopiiiiiiii e.x[%d] = %d\n", j, e.x[j]);
             }
         }
-
+        // printf("np = %d\n", np);
         recompute_data_for_entry_babai<Recompute::recompute_all_and_consider_otf_lift>(e,np);
         return e;
     }
 
+    // printf("sample large vector large = %d, fullS = %d, n = %d, params.sample_by_sums = %d\n", large, fullS, n, params.sample_by_sums);
 
     // otherwise, i.e. if large == false && fullS >= 0
 

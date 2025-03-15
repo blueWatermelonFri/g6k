@@ -634,10 +634,23 @@ void Siever::parallel_sort_cdb()
         assert(data.list_sorted_until <= data.queue_start);
         assert(data.queue_start <= data.queue_sorted_until);
         assert(data.queue_sorted_until <= cdb.size());
+        
+        // printf("data.list_sorted_until = %ld, data.queue_start = %ld, data.queue_sorted_until = %ld, cdb.size() = %ld\n", data.list_sorted_until, data.queue_start, data.queue_sorted_until, cdb.size());
+        // 在gauss sieve中有data.list_sorted_until = 0, data.queue_start = 0, data.queue_sorted_until = 0，cdb.size() = 很大的值
+        // 非gauss sieve中有data.list_sorted_until = 0， data.queue_start = data.queue_sorted_until = cdb.size()
+
+        // Checks if the elements in range [first, last) are sorted in non-descending order.
         assert(std::is_sorted(cdb.cbegin(), cdb.cbegin()+ data.list_sorted_until, compare_CE() )  );
         assert(std::is_sorted(cdb.cbegin()+ data.queue_start, cdb.cbegin() + data.queue_sorted_until, compare_CE() ));
         size_t const unsorted_list_left = data.queue_start - data.list_sorted_until;
         size_t const unsorted_queue_left = cdb.size() - data.queue_sorted_until;
+
+
+        // printf("unsorted_list_left = %ld,unsorted_queue_left = %ld,\n", unsorted_list_left, unsorted_queue_left);
+        // unsorted_list_left 和unsorted_queue_left 中有一个是0，有一个是很大的数字
+        // 通常unsorted_list_left是那个比较大的数字
+        // gauss sieve中 unsorted_list_left = 0， unsorted_queue_left 是很大的数字
+
         if ( (unsorted_list_left == 0) && (unsorted_queue_left == 0))
         {
             return; // nothing to do.
@@ -650,6 +663,10 @@ void Siever::parallel_sort_cdb()
         if (unsorted_queue_left > 0 && max_threads_queue == 0)
             max_threads_queue = 1;
 
+        // printf("max_threads_list = %ld,max_threads_queue = %ld,\n", max_threads_list, max_threads_queue);
+        // max_threads_list = 1, max_threads_queue = 0;
+
+        // printf("unsorted_list_left = %u,unsorted_queue_left = %u,\n", unsorted_list_left, unsorted_queue_left);
         if (unsorted_list_left > 0 && unsorted_queue_left > 0)
         {
             // list range : [0, data.queue_start) of which [0, data.list_sorted_until) is sorted
@@ -664,6 +681,7 @@ void Siever::parallel_sort_cdb()
         else if (unsorted_list_left > 0)
         {
             // list range : [0, data.queue_start) of which [0, data.list_sorted_until) is sorted
+            // printf("22222222222222\n");
             cdb_tmp_copy.resize(cdb.size());
             pa::sort(cdb.begin() + data.list_sorted_until, cdb.begin() + data.queue_start, compare_CE(), threadpool);
             pa::merge(cdb.begin(), cdb.begin() + data.list_sorted_until, cdb.begin() + data.list_sorted_until, cdb.begin() + data.queue_start, cdb_tmp_copy.begin(), compare_CE(), threadpool);
@@ -677,9 +695,20 @@ void Siever::parallel_sort_cdb()
         }
         else if (unsorted_queue_left > 0)
         {
+            // printf("3333333333333333\n");
+            // gauss sieve走的这个分支
+            // printf("cdb_tmp_copy = %d\n", cdb_tmp_copy.size());
+            // printf("cdb.size() = %d\n", cdb.size());
+            
+            // cdb_tmp_copy.size = cdb.size
+
+            // printf("data.queue_start = %ld, data.queue_sorted_until = %ld\n", data.queue_start, data.queue_sorted_until);
+
             // list range : [0, data.queue_start) of which [0, data.list_sorted_until) is sorted
             cdb_tmp_copy.resize(cdb.size());
             // queue range: [data.queue_start, end) of which [data.queue_start, data.queue_sorted_until) is sorted
+
+           // 在gauss sieve中有data.list_sorted_until = 0, data.queue_start = 0, data.queue_sorted_until = 0，cdb.size() = 很大的值
             pa::sort(cdb.begin() + data.queue_sorted_until, cdb.end(), compare_CE(), threadpool);
             pa::merge(cdb.begin() + data.queue_start, cdb.begin() + data.queue_sorted_until, cdb.begin() + data.queue_sorted_until, cdb.end(), cdb_tmp_copy.begin()+data.queue_start, compare_CE(), threadpool);
             if (data.queue_start > cdb.size()/2)
@@ -703,6 +732,7 @@ void Siever::grow_db_task(size_t start, size_t end, unsigned int large)
 {
     for (size_t i = start; i < end; ++i)
     {
+        // printf("sample %d th vector\n", i);
         int la = large;
         for (; la < 64; ++la)
         {
@@ -741,6 +771,8 @@ void Siever::grow_db(unsigned long N, unsigned int large)
     db.resize(N);
 
     size_t const th_n = std::min(params.threads, static_cast<size_t>(1 + Nt / MIN_ENTRY_PER_THREAD));
+    
+    // printf("thn = %d, large = %d\n", th_n, large);
 
     for (size_t c = 0; c < th_n; ++c)
     {
